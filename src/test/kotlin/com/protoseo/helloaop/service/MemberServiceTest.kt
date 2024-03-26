@@ -48,4 +48,29 @@ class MemberServiceTest {
         Assertions.assertThat(members.size).isEqualTo(1)
         Assertions.assertThat(memberCreateEvents.size).isEqualTo(1)
     }
+
+    @Test
+    fun `Transactional 메서드에서 내부 비동기 메서드 호출 시 테스트`() {
+        // 비동기 메서드로 호출되지 않고, 같은 스레드에서 동작한다.
+        memberService.outerWithInternalAsyncCall()
+
+        val members = memberRepository.findAll()
+        val memberCreateEvents = memberCreateEventRepository.findAll()
+
+        Assertions.assertThat(members.size).isEqualTo(1)
+        Assertions.assertThat(memberCreateEvents.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `Transactional 메서드에서 외부 비동기 메서드 호출 시 테스트`() {
+        // 정상적으로 비동기 메서드를 호출해서 실행한다.
+        memberService.outerWithExternalAsyncCall()
+        Thread.sleep(1000)
+
+        val members = memberRepository.findAll()
+        val memberCreateEvents = memberCreateEventRepository.findAll()
+
+        Assertions.assertThat(members.size).isEqualTo(1)
+        Assertions.assertThat(memberCreateEvents.size).isEqualTo(1)
+    }
 }
