@@ -1,5 +1,6 @@
 package com.protoseo.helloaop.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -16,23 +17,25 @@ class MemberService(
     private val memberRepository: MemberRepository,
 ) {
 
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
     @Transactional
     fun outerWithExternalCall() {
-        println("${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        log.info("${TransactionSynchronizationManager.getCurrentTransactionName()}")
         val member = memberRepository.save(Member(nickname = "nickname"))
         memberCreateEventService.innerRequiresNew(member.id!!)
     }
 
     @Transactional
     fun outerWithInternalCall() {
-        println("${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        log.info("${TransactionSynchronizationManager.getCurrentTransactionName()}")
         val member = memberRepository.save(Member(nickname = "nickname"))
-        this.innerRequiresNew(member.id!!)
+        innerRequiresNew(member.id!!)
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun innerRequiresNew(memberId: Long) {
-        println("${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        log.info("${TransactionSynchronizationManager.getCurrentTransactionName()}")
         memberCreateEventRepository.save(MemberCreateEvent(memberId = memberId))
     }
 }

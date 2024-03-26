@@ -1,5 +1,6 @@
 package com.protoseo.helloaop.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation.REQUIRES_NEW
 import org.springframework.transaction.annotation.Transactional
@@ -12,10 +13,11 @@ class MemberCreateEventService(
     private val memberCreateEventRepository: MemberCreateEventRepository
 ) {
 
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
     @Transactional(propagation = REQUIRES_NEW)
     fun innerRequiresNew(memberId: Long) {
-        println("${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        log.info("${TransactionSynchronizationManager.getCurrentTransactionName()}")
         memberCreateEventRepository.save(MemberCreateEvent(memberId = memberId))
     }
-
 }
