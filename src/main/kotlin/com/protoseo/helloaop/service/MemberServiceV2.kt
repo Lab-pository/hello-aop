@@ -1,5 +1,6 @@
 package com.protoseo.helloaop.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import com.protoseo.helloaop.annotation.Logging
@@ -14,8 +15,11 @@ class MemberServiceV2(
     private val memberRepository: MemberRepository,
 ) {
 
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
     @Transactional
     fun saveMember(): Long {
+        log.info("{}", this.javaClass)
         val member = memberRepository.save(Member(nickname = "nickname"))
         memberCreateEventRepository.save(MemberCreateEvent(memberId = member.id!!))
         return member.id!!
